@@ -1,46 +1,223 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Candy+</title>
 
-  <!-- Import Poppins ExtraBold from Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap" rel="stylesheet"/>
 
   <style>
-    /* Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root{
+      --brand-dark:#323433;     /* dark syrup + brand */
+      --bg-pink:#F2DFE6;        /* page background */
+      --cta:#fd6289;
+      --white:#ffffff;
     }
 
-    html, body {
-      height: 100%;
-      background-color: #F2DFE6;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;       /* ensure inline text is centered */
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;overflow-x:hidden;background:var(--bg-pink);font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+
+    /* ==================== ABSOLUTE TOP HEADER ==================== */
+    .top-header{
+      position:absolute;        /* requested: absolute, not sticky */
+      top:0; left:0; width:100%;
+      height:240px;             /* visual header area for the centered logo */
+      display:grid; place-items:center;
+      background:transparent;
+      overflow:visible;         /* allow the big ellipse to overflow */
+      z-index:1050;
+      pointer-events:none;      /* keep header “transparent”; logo gets events */
     }
 
-    h1 {
-      color: #323433;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      text-align: center;       /* center multi-line text if needed */
-      font-size: clamp(2rem, 8vw, 8rem);
+    /* Syrup circle container */
+    .circle-wrap{
+      position:absolute; inset:0;
+      pointer-events:none; z-index:0;
     }
+
+    /* Elliptical syrup circle:
+       - center at top middle of the screen (top=0, left=50%, translate(-50%, -50%))
+       - wider & shorter via scaleX/scaleY
+       - very large width so it overflows on all screens
+    */
+    .circle-wrap svg{
+      position:absolute;
+      top:0; left:50%;
+      width:max(140vmin, 1400px);   /* big → overflow */
+      height:auto;
+      transform:translate(-50%, -55%) scaleX(0.8) scaleY(0.5);
+      filter:drop-shadow(0 14px 28px rgba(0,0,0,0.22));
+      pointer-events:none;
+    }
+
+    /* Centered logo on top of the circle */
+    .logo-only{
+      position:relative; z-index:1; pointer-events:auto;
+      display:inline-block;
+    }
+    .logo-only img{
+      height:78px; display:block;
+      filter:drop-shadow(0 1px 0 rgba(0,0,0,.15));
+      margin-bottom: 95px;
+    }
+
+    /* ==================== BOTTOM NAVBAR (unchanged layout) ==================== */
+    .bottombar{
+      --nav-offset:0px;
+      position:fixed; left:50%; bottom:18px;
+      transform: translate(-50%, var(--nav-offset));
+      width:92%; max-width:1000px;
+      background: rgba(18,18,18,.62);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+      z-index:1000;
+      padding:8px max(12px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
+      will-change: transform;
+    }
+    .bottom-inner{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .left-slot, .right-slot{ display:flex; align-items:center; gap:8px; }
+
+    /* Icon tabs (left) */
+    .tab{
+      text-decoration:none; color:#fff;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:4px; padding:6px 8px; border-radius:12px;
+      transition: background .15s ease, transform .15s ease;
+      min-width:80px;
+    }
+    .tab:hover{ background: rgba(255,255,255,.12); transform: translateY(-1px); }
+    .tab .icon-wrap{ width:30px; height:30px; border-radius:50%; display:grid; place-items:center; }
+    .tab img.icon{ width:20px; height:20px; object-fit:contain; display:block; }
+    .tab .label{ font-size:.78rem; line-height:1; font-weight:800; }
+
+    /* Pill buttons (right) */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; text-decoration:none; color:#fff;
+      font-weight:900; padding:10px 14px;
+      border-radius:12px;
+      transition:transform .18s, box-shadow .18s, background .18s;
+      white-space:nowrap;
+    }
+    .btn.member{ background:#6c7a89; }
+    .btn.member:hover{ transform:translateY(-1px); }
+    .btn.cta{ background:var(--cta); box-shadow:3px 3px 0 #2d2e2e; }
+    .btn.cta:hover{ box-shadow:2px 2px 0 #2d2e2e; transform:translate(1px,1px); }
+    .btn.cta:active{ background:#4fcf43; box-shadow:1px 1px 0 #2d2e2e; transform:translate(2px,2px); }
+
+    /* ==================== CONTENT ==================== */
+    /* Add top padding so content doesn't sit under the absolute header */
+    main{
+      min-height:100vh;
+      padding: 260px 16px 120px;  /* header height + some buffer, bottom for navbar */
+      display:grid; place-items:center; text-align:center;
+    }
+    h1{ color:#323433; text-transform:uppercase; letter-spacing:.1em; font-size:clamp(2rem,8vw,8rem) }
   </style>
 </head>
 <body>
-  <h1>KOMMER SNART &#59;&#41;</h1>
+
+  <!-- ABSOLUTE TOP: Centered logo with BIG dark syrup ellipse behind (center at top-middle) -->
+  <header class="top-header" aria-label="Topp">
+    <div class="circle-wrap" aria-hidden="true">
+      <svg viewBox="0 0 600 600">
+        <!-- Dark syrup ellipse (animated wavy edge) -->
+        <path id="wavyCircle" fill="#323433"></path>
+      </svg>
+    </div>
+    <a href="index.html" class="logo-only" aria-label="Candy+ Hem">
+      <img src="logo.png" alt="Candy+ Logo">
+    </a>
+  </header>
+
+  <!-- BOTTOM NAVBAR -->
+  <nav class="bottombar" id="bottombar">
+    <div class="bottom-inner">
+      <!-- Left: icon tabs -->
+      <div class="left-slot">
+        <a href="#faq" class="tab">
+          <span class="icon-wrap"><img class="icon" src="icon-faq.png" alt=""></span>
+          <span class="label">Allmänna frågor</span>
+        </a>
+        <a href="#sortiment" class="tab">
+          <span class="icon-wrap"><img class="icon" src="icon-list.png" alt=""></span>
+          <span class="label">Vår sortiment</span>
+        </a>
+        <a href="#kontakt" class="tab">
+          <span class="icon-wrap"><img class="icon" src="icon-mail.png" alt=""></span>
+          <span class="label">Kontakta oss</span>
+        </a>
+      </div>
+
+      <!-- Right: moved pill buttons -->
+      <div class="right-slot">
+        <a href="#bli-medlem" class="btn member">Bli medlem</a>
+        <a href="booking.html" class="btn cta">Boka släp</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <h1>KOMMER SNART &#59;&#41;</h1>
+  </main>
+
+  <script>
+    // ===== Wavy syrup ellipse behind logo (centered at top-middle, dark, wider/shorter) =====
+    (function () {
+      const path = document.getElementById("wavyCircle");
+      const cx = 300, cy = 300;          // center in 600x600 viewbox
+      const R  = 200;                    // bigger base radius
+      const A  = 3;                     // wave amplitude
+      const λ  = 150;                    // wavelength along X
+      const v  = 60;                    // wave speed (px/s)
+      const samples = 640;
+      let t = 0, last = performance.now();
+
+      function draw() {
+        const k = (2*Math.PI)/λ;
+        const pts = [];
+        for (let i = 0; i <= samples; i++) {
+          const θ = (i/samples) * 2*Math.PI;
+          const x0 = cx + R * Math.cos(θ);
+          const y0 = cy + R * Math.sin(θ);
+          // vertical traveling wave
+          const y  = y0 + A * Math.sin(k * x0 - k * v * t);
+          pts.push([x0, y]);
+        }
+        let d = `M${pts[0][0].toFixed(2)},${pts[0][1].toFixed(2)}`;
+        for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0].toFixed(2)},${pts[i][1].toFixed(2)}`;
+        d += " Z";
+        path.setAttribute("d", d);
+      }
+
+      function tick(now){
+        const dt = Math.min(0.05, (now - last)/1000);
+        last = now; t += dt;
+        draw(); requestAnimationFrame(tick);
+      }
+      draw(); requestAnimationFrame(tick);
+    })();
+
+    // ===== Gentle bobbing for bottom bar (unchanged) =====
+    (function () {
+      const bar = document.getElementById('bottombar');
+      let lastY = window.scrollY, y = 0, v = 0;
+      const k = 0.08, f = 0.86, max = 16;
+      function onScroll(){ const curr=window.scrollY; v += (curr-lastY)*0.18; lastY=curr; }
+      function tick(){ v += (0-y)*k; v *= f; y += v;
+        y = Math.max(-max, Math.min(max, y));
+        bar.style.setProperty('--nav-offset', y.toFixed(2)+'px');
+        requestAnimationFrame(tick);
+      }
+      addEventListener('scroll',onScroll,{passive:true});
+      addEventListener('wheel',onScroll,{passive:true});
+      addEventListener('touchmove',onScroll,{passive:true});
+      requestAnimationFrame(tick);
+    })();
+  </script>
 </body>
 </html>
